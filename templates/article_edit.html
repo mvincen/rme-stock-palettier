@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Modifier article {{ code }}{% endblock %}
+
+{% block content %}
+<h2>Modifier l'article (code={{ code }})</h2>
+<form method="POST" class="row g-3">
+  <div class="col-md-3">
+    <label>Référence :</label>
+    <input type="text" name="reference" class="form-control" value="{{ old_ref }}">
+  </div>
+  <div class="col-md-3">
+    <label>Login :</label>
+    <input type="text" name="login" class="form-control" value="{{ old_login }}">
+  </div>
+  <div class="col-md-3">
+    <label>Quantité :</label>
+    <input type="number" name="quantity" class="form-control" min="1" value="{{ old_qty }}">
+  </div>
+  <div class="col-md-3 d-flex align-items-end">
+    <button type="submit" class="btn btn-success w-100">Valider</button>
+  </div>
+</form>
+
+<p class="mt-3">
+  <a href="{{ url_for('show_bin', bin_name=bin_name) }}" class="btn btn-light">Annuler / Retour</a>
+</p>
+{% endblock %}

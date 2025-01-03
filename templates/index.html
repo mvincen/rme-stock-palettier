@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block title %}Accueil - Palettier{% endblock %}
+
+{% block content %}
+<h1>Accueil - Palettier (Zones E..A)</h1>
+
+<form action="{{ url_for('search') }}" method="GET" class="my-3">
+  <div class="input-group">
+    <input type="text" name="q" class="form-control" placeholder="Recherche bin ou article...">
+    <button type="submit" class="btn btn-secondary">Rechercher</button>
+  </div>
+</form>
+
+<div class="row">
+  {% for line in lines_data %}
+  <div class="col-12 mb-3">
+    <div class="card">
+      <div class="card-header">Zone {{ line.letter }}</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row">
+              {% for b in line.bins %}
+              <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card">
+                  <div class="card-body p-2">
+                    <h5 style="font-size:1rem;">
+                      <a href="{{ url_for('show_bin', bin_name=b.bin_name) }}">{{ b.bin_name }}</a>
+                    </h5>
+                    <p class="mb-1">{{ b.weight }} / 500 kg</p>
+                    <div class="progress" style="height:15px;">
+                      <div class="progress-bar bg-info" role="progressbar"
+                           style="width: {{ b.ratio_percent }}%;"
+                           aria-valuenow="{{ b.ratio_percent }}" aria-valuemin="0" aria-valuemax="100">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h5>Groupes (1..4 / 5..8)</h5>
+            <div class="mb-3">
+              <p>{{ line.group1.weight }} / 2000 kg ({{ line.letter }}1..4)</p>
+              <div class="progress" style="height:15px;">
+                <div class="progress-bar bg-success" role="progressbar"
+                     style="width: {{ line.group1.ratio_percent }}%;"
+                     aria-valuenow="{{ line.group1.ratio_percent }}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>
+            <div>
+              <p>{{ line.group2.weight }} / 2000 kg ({{ line.letter }}5..8)</p>
+              <div class="progress" style="height:15px;">
+                <div class="progress-bar bg-success" role="progressbar"
+                     style="width: {{ line.group2.ratio_percent }}%;"
+                     aria-valuenow="{{ line.group2.ratio_percent }}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>  
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

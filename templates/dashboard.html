@@ -1,0 +1,168 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="row mb-3">
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header">Articles totaux</div>
+      <div class="card-body fs-4 text-center">
+        {{ total_articles }}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header">Entrées cumulées</div>
+      <div class="card-body fs-4 text-center">
+        <span class="text-success">+{{ articles_in }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header">Sorties cumulées</div>
+      <div class="card-body fs-4 text-center">
+        <span class="text-danger">-{{ articles_out }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Top 5 Entrées (IN)</div>
+      <div class="card-body">
+        <ul class="list-group">
+          {% for code, total_in in top5_in_list %}
+          <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
+            <span>{{ code }}</span>
+            <span class="badge bg-success">{{ total_in }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Top 5 Sorties (OUT)</div>
+      <div class="card-body">
+        <ul class="list-group">
+          {% for code, total_out in top5_out_list %}
+          <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
+            <span>{{ code }}</span>
+            <span class="badge bg-danger">{{ total_out }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">Filtrer les mouvements par date</div>
+  <div class="card-body">
+    <form method="POST" class="row g-3">
+      <div class="col-auto">
+        <label for="start_date" class="form-label">Du :</label>
+        <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}">
+      </div>
+      <div class="col-auto">
+        <label for="end_date" class="form-label">Au :</label>
+        <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
+      </div>
+      <div class="col-auto d-flex align-items-end">
+        <button type="submit" class="btn btn-secondary">Filtrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Graphique flux (IN+OUT) par jour -->
+<div class="card mb-4">
+  <div class="card-header">Flux de mouvements</div>
+  <div class="card-body">
+    <canvas id="fluxChart" width="400" height="200"></canvas>
+  </div>
+</div>
+
+<!-- Graphique usage (IN+OUT) par article -->
+<div class="card mb-4">
+  <div class="card-header">Mouvements par article</div>
+  <div class="card-body">
+    <canvas id="usageChart" width="400" height="200"></canvas>
+  </div>
+</div>
+
+{% if duplicates %}
+<div class="card mb-3">
+  <div class="card-header">Articles présents dans plusieurs bins</div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for code, binlist in duplicates %}
+      <li class="list-group-item text-dark">
+        <strong>{{ code }}</strong> => {{ binlist|join(', ') }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<p><a href="{{ url_for('export_excel') }}" class="btn btn-outline-light">Exporter en Excel</a></p>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var ctx1=document.getElementById('fluxChart').getContext('2d');
+var fluxChart=new Chart(ctx1,{
+  type:'line',
+  data:{
+    labels: {{ chart_labels|tojson }},
+    datasets:[{
+      label:'Mouvements / jour',
+      data: {{ chart_values|tojson }},
+      borderColor:'rgb(75,192,192)',
+      fill:false,
+      tension:0.1
+    }]
+  },
+  options:{
+    scales:{
+      x:{ticks:{color:'#fff'},grid:{color:'#444'}},
+      y:{beginAtZero:true,ticks:{color:'#fff'},grid:{color:'#444'}}
+    },
+    plugins:{
+      legend:{labels:{color:'#fff'}}
+    }
+  }
+});
+
+var ctx2=document.getElementById('usageChart').getContext('2d');
+var usageChart=new Chart(ctx2,{
+  type:'bar',
+  data:{
+    labels:{{ usage_labels|tojson }},
+    datasets:[{
+      label:'Nb de mouvements',
+      data:{{ usage_values|tojson }},
+      backgroundColor:'rgba(255,99,132,0.6)'
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    scales:{
+      x:{ticks:{color:'#fff'},grid:{color:'#444'}},
+      y:{ticks:{color:'#fff'},grid:{color:'#444'}}
+    },
+    plugins:{
+      legend:{labels:{color:'#fff'}}
+    }
+  }
+});
+</script>
+{% endblock %}

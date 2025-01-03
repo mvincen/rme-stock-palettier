@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block content %}
+<h2>Résultats pour "{{ query }}"</h2>
+{% if results_list %}
+<ul class="list-group">
+  {% for (code, binlist) in results_list %}
+  <li class="list-group-item text-dark">
+    <strong>Code : {{ code }}</strong><br>
+    Bins :
+    {% for bn in binlist %}
+      <a href="{{ url_for('show_bin', bin_name=bn) }}" class="btn btn-sm btn-outline-info m-1">Aller à {{ bn }}</a>
+    {% endfor %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="alert alert-info">Aucun article trouvé.</div>
+{% endif %}
+<a href="{{ url_for('index') }}" class="btn btn-light mt-3">Retour</a>
+{% endblock %}

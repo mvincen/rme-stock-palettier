@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h1>Créer un compte</h1>
+    <form method="POST" action="{{ url_for('register') }}">
+        <label>Utilisateur :</label>
+        <input type="text" name="username">
+        <br>
+        <label>Mot de passe :</label>
+        <input type="password" name="password">
+        <br><br>
+        <button type="submit">S'inscrire</button>
+    </form>
+</body>
+</html>

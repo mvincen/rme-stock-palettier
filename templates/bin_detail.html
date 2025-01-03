@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}Bin {{ bin_info[1] }}{% endblock %}
+
+{% block content %}
+<h2>Bin {{ bin_info[1] }}</h2>
+<p>Poids : {{ bin_info[2] }} / 500 kg</p>
+<div class="progress mb-2" style="height:20px;">
+  <div class="progress-bar bg-info" role="progressbar"
+       style="width: {{ ratio_percent }}%;"
+       aria-valuenow="{{ ratio_percent }}" aria-valuemin="0" aria-valuemax="100">
+  </div>
+</div>
+
+{% if bin_info[3] %}
+  <p>Image :
+    <a href="{{ url_for('bin_full_image', bin_name=bin_info[1]) }}">
+      <img src="{{ url_for('static', filename=bin_info[3].split('static/',1)[1]) }}" style="max-width:200px;">
+    </a>
+  </p>
+{% else %}
+  <p>Aucune image pour ce bin.</p>
+{% endif %}
+
+<hr>
+<h4>Articles présents</h4>
+<ul class="list-group mb-3">
+{% for art in articles %}
+  <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
+    <div>
+      <strong>ID={{ art[0] }}</strong> - Code={{ art[1] }}
+      <br>Réf={{ art[2] }}, Login={{ art[3] }}, Qty={{ art[4] }}
+    </div>
+    <div>
+      <a href="{{ url_for('edit_article_route', article_id=art[0]) }}" class="btn btn-sm btn-warning">Modifier</a>
+      <a href="{{ url_for('remove_article_route', article_id=art[0]) }}" class="btn btn-sm btn-danger">Supprimer</a>
+    </div>
+  </li>
+{% endfor %}
+</ul>
+
+<div class="card mb-3">
+  <div class="card-header">Ajouter un article</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('bin_add_article_route', bin_name=bin_info[1]) }}" class="row g-3">
+      <div class="col-md-3">
+        <label>Code :</label>
+        <input type="text" name="code" class="form-control" required>
+      </div>
+      <div class="col-md-3">
+        <label>Référence :</label>
+        <input type="text" name="reference" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label>Login :</label>
+        <input type="text" name="login" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label>Quantité :</label>
+        <input type="number" name="quantity" class="form-control" min="1" value="1">
+      </div>
+      <div class="col-12 d-flex align-items-end">
+        <button type="submit" class="btn btn-success">Ajouter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<hr>
+<div class="card mb-3">
+  <div class="card-header">Mettre à jour le poids</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('bin_update_weight_route', bin_name=bin_info[1]) }}" class="row g-3">
+      <div class="col-md-4">
+        <label>Nouveau poids (kg) :</label>
+        <input type="number" step="0.01" name="new_weight" class="form-control">
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
+      </div>
+    </form>
+    <p class="mt-2 text-warning">Limite : 500 kg / bin, 2000 kg / groupe.</p>
+  </div>
+</div>
+
+<hr>
+<h4>Gérer l'image</h4>
+<form method="POST" action="{{ url_for('bin_upload_image_route', bin_name=bin_info[1]) }}" enctype="multipart/form-data" class="row g-3">
+  <div class="col-auto">
+    <input type="file" name="bin_image" class="form-control">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-info">Uploader</button>
+  </div>
+</form>
+<a href="{{ url_for('bin_remove_image_route', bin_name=bin_info[1]) }}" class="btn btn-warning my-2">Supprimer l'image</a>
+
+<br>
+<a href="{{ url_for('index') }}" class="btn btn-light">Retour</a>
+{% endblock %}
